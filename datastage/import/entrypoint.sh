@@ -9,9 +9,9 @@ PATH="$PATH:$MCIX_BIN_DIR"
 : "${PARAM_API_KEY:?Missing required input: api-key}"
 : "${PARAM_URL:?Missing required input: url}"
 : "${PARAM_USER:?Missing required input: user}"
+: "${PARAM_ASSETS:?Missing required input: assets}"
 
 # Optional arguments
-ASSETS="${PARAM_ASSETS:-}"
 PROJECT="${PARAM_PROJECT:-}"
 PROJECT_ID="${PARAM_PROJECT_ID:-}"
 
@@ -31,10 +31,8 @@ fi
 CMD="$MCIX_CMD datastage import \
     -api-key \"$PARAM_API_KEY\" \
     -url \"$PARAM_URL\" \
-    -user \"$PARAM_USER\""
-
-# Add optional assets argument
-[ -n "$ASSETS" ] && CMD="$CMD -assets \"$ASSETS\""
+    -user \"$PARAM_USER\" \
+    -assets \"$PARAM_ASSETS\""
 
 # Add optional project/project-id
 [ -n "$PROJECT" ] && CMD="$CMD -project \"$PROJECT\""

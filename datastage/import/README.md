@@ -1,32 +1,32 @@
-# MCIX asset-analysis test docker action
+# mcix datastage import GitHub action
 
-This action invokes the [mcix asset-analysis test](https://nextgen.mettleci.io/mettleci-cli/asset-analysis-namespace/#asset-analysis-test) command.
+This action invokes the [mcix datastage import](https://nextgen.mettleci.io/mettleci-cli/datastage-namespace/#import) command.
 
 ## Inputs
 
-## Rules
+* api-key (Required)
 
-**Required** Path to the compliance rules. Default `/app/rules`.
+CP4D/CP4DaaS API key
 
-## Path
-        description: 'Path to the DataStage assets to analyze'
-        required: false
-        default: /app/datastage
-## Report
-        description: 'JUnit report file path'
-        required: false
-        default: /app/asset_analysis_report.xml
-## Test-suite
-        description: 'Test suite name'
-        required: false
-        default: 'mcix tests'
+* *url (Required)
 
-## Ignore-test-failures
+Base url of CP4D/CP4DaaS
 
-Ignore test failures (always return 0)
+* user (Required)
 
-## Include-job-in-test-name
-Include job name in test name
+CP4D/CP4DaaS username
+
+* assets (Required)
+
+Path to DataStage export zip file or directory
+
+* project (Required when -project-id not specified)
+
+Name of target project
+
+* project-id (Required when -project not specified)
+
+Id of target project
 
 ## Outputs
 
