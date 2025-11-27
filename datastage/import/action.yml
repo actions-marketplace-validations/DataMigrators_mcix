@@ -39,7 +39,6 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-#  image: 'docker://ghcr.io/datamigrators/mcix-container:latest'
   env:
     PARAM_API_KEY: ${{ inputs.api-key }}
     PARAM_URL: ${{ inputs.url }}
