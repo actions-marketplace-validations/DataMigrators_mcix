@@ -34,7 +34,6 @@ CMD="$MCIX_CMD unit-test execute \
  -url \"$PARAM_URL\" \
  -user \"$PARAM_USER\" \
  -report \"$PARAM_REPORT\" \
- -rules \"$PARAM_RULES\""
 
 # Add optional project/project-id
 [ -n "$PROJECT" ] && CMD="$CMD -project \"$PROJECT\""
