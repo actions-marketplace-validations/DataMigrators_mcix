@@ -1,15 +1,47 @@
 #!/bin/sh -l
+
+# ███╗   ███╗███████╗████████╗████████╗██╗     ███████╗ ██████╗██╗
+# ████╗ ████║██╔════╝╚══██╔══╝╚══██╔══╝██║     ██╔════╝██╔════╝██║
+# ██╔████╔██║█████╗     ██║      ██║   ██║     █████╗  ██║     ██║
+# ██║╚██╔╝██║██╔══╝     ██║      ██║   ██║     ██╔══╝  ██║     ██║
+# ██║ ╚═╝ ██║███████╗   ██║      ██║   ███████╗███████╗╚██████╗██║
+# ╚═╝     ╚═╝╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚══════╝ ╚═════╝╚═╝
+# MettleCI DevOps for DataStage       (C) 2025-2026 Data Migrators
+
 set -eu
 
-# Failure handling utility function
-die() { echo "$*" 1>&2 ; exit 1; }
+# -----
+# Setup
+# -----
+MCIX_BIN_DIR="/usr/share/mcix/bin"
+MCIX_CMD="$MCIX_BIN_DIR/mcix"
+PATH="$PATH:$MCIX_BIN_DIR"
 
-MCIX_BIN_DIR="/usr/share/mcix/bin/"
-MCIX_CMD="/usr/share/mcix/bin/mcix"
-PATH=$PATH:$MCIX_BIN_DIR
+: "${GITHUB_OUTPUT:?GITHUB_OUTPUT must be set}"
 
-env
+# -----------------
+# Utility functions
+# -----------------
 
-${MCIX_CMD} system version 
+write_return_code() {
+  rc=$?
+  echo "return-code=$rc" >>"$GITHUB_OUTPUT"
+}
+trap write_return_code EXIT
 
-echo ${?} >> GITHUB_OUTPUT
+# ------------------------
+# Build command to execute
+# ------------------------
+
+# Start argv
+set -- "$MCIX_CMD" system version
+
+# -------
+# Execute
+# -------
+echo "Executing: $*"
+
+"$@"
+
+status=$?
+exit "$status"

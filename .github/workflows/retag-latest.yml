@@ -1,0 +1,62 @@
+name: Retag 'latest' on version release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # triggers on vX.Y.Z (e.g. v1.2.3)
+
+permissions:
+  contents: write  # required to push tags
+
+jobs:
+  retag-latest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo (with full history & tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract version info
+        id: version
+        run: |
+          # GITHUB_REF is like refs/tags/v1.2.3
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=$TAG" >>"$GITHUB_OUTPUT"
+
+          # Major version (v1 from v1.2.3)
+          MAJOR="${TAG%%.*}"
+          echo "major=$MAJOR" >>"$GITHUB_OUTPUT"
+
+      - name: Move 'latest' tag to this release
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+
+          # Delete local 'latest' if it exists (ignore error)
+          git tag -d latest 2>/dev/null || true
+
+          # Recreate 'latest' pointing to this tag's commit
+          git tag -a latest -m "Latest release: $TAG" "$TAG"
+
+          # Push 'latest' (force-update on remote)
+          git push origin latest --force
+
+      - name: Move major tag (e.g. v1) to this release
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          MAJOR="${{ steps.version.outputs.major }}"
+
+          # Delete local major tag if it exists (ignore error)
+          git tag -d "$MAJOR" 2>/dev/null || true
+
+          # Recreate major tag pointing to this tag's commit
+          git tag -a "$MAJOR" -m "Major release line: $MAJOR ($TAG)" "$TAG"
+
+          # Push major tag (force-update on remote)
+          git push origin "$MAJOR" --force
