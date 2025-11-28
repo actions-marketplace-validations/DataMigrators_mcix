@@ -55,7 +55,8 @@ normalise_bool() {
 # ---------------
 # Step summary
 # ---------------
-# Action-specific summary for this entrypointwrite_step_summary() {
+# Action-specific summary for this entrypoint
+write_step_summary() {
   rc=$1
 
   status_emoji="🎉"
@@ -85,7 +86,6 @@ normalise_bool() {
 \`${rc}\`
 EOF
 }
-
 
 # Generic trap that always sets return-code and writes the step summary
 write_return_code_and_summary() {
