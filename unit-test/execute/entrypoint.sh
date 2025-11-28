@@ -33,7 +33,7 @@ CMD="$MCIX_CMD unit-test execute \
  -api-key \"$PARAM_API_KEY\" \
  -url \"$PARAM_URL\" \
  -user \"$PARAM_USER\" \
- -report \"$PARAM_REPORT\" \
+ -report \"$PARAM_REPORT\""
 
 # Add optional project/project-id
 [ -n "$PROJECT" ] && CMD="$CMD -project \"$PROJECT\""
