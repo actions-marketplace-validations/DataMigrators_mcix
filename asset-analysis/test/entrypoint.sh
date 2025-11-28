@@ -10,16 +10,11 @@ PATH="$PATH:$MCIX_BIN_DIR"
 : "${PARAM_URL:?Missing required input: url}"
 : "${PARAM_USERNAME:?Missing required input: username}"
 : "${PARAM_REPORT:?Missing required input: report}"
+: "${PARAM_RULES:?Missing required input: rules}"
 
 # Optional arguments
 PROJECT="${PARAM_PROJECT:-}"
 PROJECT_ID="${PARAM_PROJECT_ID:-}"
-
-# PARAM_RULES: ${{ inputs.rules }}
-# PARAM_INCLUDED_TAGS: ${{ inputs.included-tags }}
-# : ${{ inputs.excluded-tags }}
-# PARAM_TEST_SUITE: ${{ inputs.test-suite }}
-# PARAM_IGNORE_TEST_FAILURES: ${{ inputs.ignore-test-failures }}
 
 # Failure handling utility function
 die() { echo "$*" 1>&2 ; exit 1; }
@@ -51,6 +46,10 @@ CMD="$MCIX_CMD asset-analysis test \
 # Echo diagnostics for included and excluded tags
 [ -n "$PARAM_INCLUDED_TAGS" ] && CMD="$CMD -include-tag \"$PARAM_INCLUDED_TAGS\""
 [ -n "$PARAM_EXCLUDED_TAGS" ] && CMD="$CMD -exclude-tag \"$PARAM_EXCLUDED_TAGS\""
+
+[ -n "$PARAM_TEST_SUITE" ] && CMD="$CMD -test-suite \"$PARAM_TEST_SUITE\""
+
+[ -n "$PARAM_IGNORE_TEST_FAILURES" ] && CMD="$CMD -ignore-test-failures"
 
 echo "Executing: $CMD"
 
