@@ -1,6 +1,9 @@
 #!/bin/sh -l
 set -eu
 
+# Failure handling utility function
+die() { echo "$*" 1>&2 ; exit 1; }
+
 MCIX_BIN_DIR="/usr/share/mcix/bin"
 MCIX_CMD="$MCIX_BIN_DIR/mcix"
 PATH="$PATH:$MCIX_BIN_DIR"
@@ -14,8 +17,6 @@ PATH="$PATH:$MCIX_BIN_DIR"
 # Optional arguments
 PROJECT="${PARAM_PROJECT:-}"
 PROJECT_ID="${PARAM_PROJECT_ID:-}"
-
-die() { echo "$*" 1>&2 ; exit 1; }
 
 # 1) Fail if BOTH project and project-id were provided
 if [ -n "$PROJECT" ] && [ -n "$PROJECT_ID" ]; then

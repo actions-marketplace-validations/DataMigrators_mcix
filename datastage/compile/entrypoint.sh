@@ -74,10 +74,12 @@ set -- "$@" -url "$PARAM_URL"
 set -- "$@" -user "$PARAM_USER"
 set -- "$@" -report "$PARAM_REPORT"
 
-# Mutually exclusive project / project-id handling
+# Mutually exclusive project / project-id handling (safe with set -u)
+PROJECT="${PARAM_PROJECT:-}"
+PROJECT_ID="${PARAM_PROJECT_ID:-}"
 choose_project
-[ -n "$PARAM_PROJECT" ]    && set -- "$@" -project "$PARAM_PROJECT"
-[ -n "$PARAM_PROJECT_ID" ] && set -- "$@" -project-id "$PARAM_PROJECT_ID"
+[ -n "$PROJECT" ]    && set -- "$@" -project "$PROJECT"
+[ -n "$PROJECT_ID" ] && set -- "$@" -project-id "$PROJECT_ID"
 
 # Optional scalar flags
 # None in this action
