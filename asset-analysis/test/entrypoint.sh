@@ -8,7 +8,7 @@ PATH="$PATH:$MCIX_BIN_DIR"
 # Validate required vars
 : "${PARAM_API_KEY:?Missing required input: api-key}"
 : "${PARAM_URL:?Missing required input: url}"
-: "${PARAM_USER:?Missing required input: user}"
+: "${PARAM_USERNAME:?Missing required input: username}"
 : "${PARAM_REPORT:?Missing required input: report}"
 
 # Optional arguments
@@ -38,7 +38,7 @@ fi
 CMD="$MCIX_CMD asset-analysis test \
  -api-key \"$PARAM_API_KEY\" \
  -url \"$PARAM_URL\" \
- -user \"$PARAM_USER\" \
+ -user \"$PARAM_USERNAME\" \
  -report \"$PARAM_REPORT\""
 
 # Add optional argument flags
