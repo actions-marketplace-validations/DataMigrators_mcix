@@ -1,4 +1,3 @@
-# action.yml
 name: 'MCIX asset-analysis test action'
 author: 'Data Migrators Pty Ltd'
 description: 'Runs mcix asset-analysis test'
