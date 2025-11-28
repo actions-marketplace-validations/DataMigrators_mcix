@@ -17,7 +17,7 @@ PROJECT_ID="${PARAM_PROJECT_ID:-}"
 
 # PARAM_RULES: ${{ inputs.rules }}
 # PARAM_INCLUDED_TAGS: ${{ inputs.included-tags }}
-# PARAM_EXCLUDED_TAGS: ${{ inputs.excluded-tags }}
+# : ${{ inputs.excluded-tags }}
 # PARAM_TEST_SUITE: ${{ inputs.test-suite }}
 # PARAM_IGNORE_TEST_FAILURES: ${{ inputs.ignore-test-failures }}
 
@@ -49,8 +49,8 @@ CMD="$MCIX_CMD asset-analysis test \
 [ -n "$PROJECT_ID" ] && CMD="$CMD -project-id \"$PROJECT_ID\""
 
 # Echo diagnostics for included and excluded tags
-[ -n "$INCLUDETAGS" ] && CMD="$CMD -include-tag \"$INCLUDETAGS\""
-[ -n "$EXCLUDEDTAGS" ] && CMD="$CMD -exclude-tag \"$EXCLUDEDTAGS\""
+[ -n "$PARAM_INCLUDED_TAGS" ] && CMD="$CMD -include-tag \"$PARAM_INCLUDED_TAGS\""
+[ -n "$PARAM_EXCLUDED_TAGS" ] && CMD="$CMD -exclude-tag \"$PARAM_EXCLUDED_TAGS\""
 
 echo "Executing: $CMD"
 
