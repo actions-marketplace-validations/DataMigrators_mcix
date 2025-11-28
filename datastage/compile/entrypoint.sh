@@ -52,6 +52,54 @@ normalise_bool() {
   esac
 }
 
+# ---------------
+# Step summary
+# ---------------
+# Action-specific summary for this entrypointwrite_step_summary() {
+  rc=$1
+
+  status_emoji="🎉"
+  status_title="Success"
+  [ "$rc" -ne 0 ] && status_emoji="❌" && status_title="Failure"
+
+  project_display="${PROJECT:-<none>}"
+  [ -n "${PROJECT_ID:-}" ] && project_display="${project_display} (ID: ${PROJECT_ID})"
+
+  include_flag="$(normalise_bool "${PARAM_INCLUDE_ASSET_IN_TEST_NAME:-0}")"
+  include_label="No"
+  [ "$include_flag" -eq 1 ] && include_label="Yes"
+
+  cat >>"$GITHUB_STEP_SUMMARY" <<EOF
+## ${status_emoji} MCIX DataStage Compile – ${status_title}
+
+### 📁 Project
+\`${project_display}\`
+
+### 📄 Report
+\`${PARAM_REPORT}\`
+
+### 🔧 Include Asset In Test Name
+\`${include_label}\`
+
+### 🚦 Exit Code
+\`${rc}\`
+EOF
+}
+
+
+# Generic trap that always sets return-code and writes the step summary
+write_return_code_and_summary() {
+  rc=$?
+  echo "return-code=$rc" >>"$GITHUB_OUTPUT"
+
+  # Only write step summary if GitHub provides the file
+  [ -z "${GITHUB_STEP_SUMMARY:-}" ] && exit "$rc"
+
+  write_step_summary "$rc"
+  exit "$rc"
+}
+trap write_return_code_and_summary EXIT
+
 # -------------------
 # Validate parameters
 # -------------------

@@ -53,22 +53,26 @@ normalise_bool() {
 write_step_summary() {
   rc=$1
 
+  status_emoji="🎉"
+  status_title="Success"
+  [ "$rc" -ne 0 ] && status_emoji="❌" && status_title="Failure"
+
   project_display="${PROJECT:-<none>}"
   [ -n "${PROJECT_ID:-}" ] && project_display="${project_display} (ID: ${PROJECT_ID})"
 
-  status_emoji="✅"
-  [ "$rc" -ne 0 ] && status_emoji="❌"
-
   cat >>"$GITHUB_STEP_SUMMARY" <<EOF
-### ${status_emoji} MCIX DataStage Import
+## ${status_emoji} MCIX DataStage Import – ${status_title}
 
-**Project:** ${project_display}  
-**Assets:** \`${PARAM_ASSETS:-<none>}\`  
+### 📁 Project
+\`${project_display}\`
 
-**Exit code:** \`$rc\`
+### 📦 Assets
+\`${PARAM_ASSETS:-<none>}\`
+
+### 🚦 Exit Code
+\`${rc}\`
 EOF
 }
-
 
 # Generic trap that always sets return-code and writes the step summary
 write_return_code_and_summary() {
