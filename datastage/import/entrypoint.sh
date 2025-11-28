@@ -81,7 +81,7 @@ set -- "$MCIX_CMD" datastage import
 set -- "$@" -api-key "$PARAM_API_KEY"
 set -- "$@" -url "$PARAM_URL"
 set -- "$@" -user "$PARAM_USER"
-set -- "$@" -report "$PARAM_ASSETS"
+set -- "$@" -assets "$PARAM_ASSETS"
 
 # Mutually exclusive project / project-id handling (safe with set -u)
 PROJECT="${PARAM_PROJECT:-}"
