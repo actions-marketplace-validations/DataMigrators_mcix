@@ -38,7 +38,7 @@ fi
 CMD="$MCIX_CMD asset-analysis test \
  -api-key \"$PARAM_API_KEY\" \
  -url \"$PARAM_URL\" \
- -user \"$PARAM_USERNAME\" \
+ -username \"$PARAM_USERNAME\" \
  -report \"$PARAM_REPORT\""
 
 # Add optional argument flags
