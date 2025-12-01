@@ -110,7 +110,7 @@ write_step_summary() {
 
   {
     cat <<EOF
-### ${status_emoji} MCIX System Version – ${status_title}
+### ${status_emoji} MCIX DataStage Import – ${status_title}
 
 | Property    | Value                          |
 |------------|---------------------------------|
@@ -126,7 +126,7 @@ EOF
       #echo
 
       echo '<details>'
-      echo '<summary>Processed assets</summary>'
+      echo '<summary>Imported assets</summary>'
       echo
       echo '| Asset | Type | Status |' >>"$GITHUB_STEP_SUMMARY"
       echo '|-------|------|--------|' >>"$GITHUB_STEP_SUMMARY"

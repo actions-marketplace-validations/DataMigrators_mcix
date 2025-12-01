@@ -19,9 +19,6 @@ PATH="$PATH:$MCIX_BIN_DIR"
 
 : "${GITHUB_OUTPUT:?GITHUB_OUTPUT must be set}"
 
-# Optional but useful for debugging
-echo "GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-<unset>}" >&2 || true
-
 # We'll store the real command status here so the trap can see it
 MCIX_STATUS=0
 
@@ -46,7 +43,6 @@ write_step_summary() {
 |------------|---------------------------------|
 | **Project**  | \`${project_display}\`        |
 | **Assets**   | \`${PARAM_ASSETS:-<none>}\`   |
-| **Exit Code** | \`${rc}\`                    |
 EOF
 
     if [ -n "${CMD_OUTPUT:-}" ]; then
