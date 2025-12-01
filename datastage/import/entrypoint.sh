@@ -116,78 +116,71 @@ write_step_summary() {
 |------------|---------------------------------|
 | **Project**  | \`${project_display}\`        |
 | **Assets**   | \`${PARAM_ASSETS:-<none>}\`   |
-| **Exit Code** | \`${rc}\`                    |
 EOF
 
     if [ -n "${CMD_OUTPUT:-}" ]; then
-      printf '\n### MettleCI Command Output\n\n'
-
-      echo '```text'
-      printf '%s\n' "$CMD_OUTPUT" | awk '
-        /^Loaded plugins:/ { in_plugins = 1; next }
-        in_plugins && /^\s*\*/ { next }  # skip plugin lines
-        { print }
-      '
-      echo '```'
-      echo
+      #printf '\n### MettleCI Command Output\n\n'
+      #echo '```text'
+      #printf '%s\n' "$CMD_OUTPUT" 
+      #echo '```'
+      #echo
 
       echo '<details>'
-      echo '<summary>Loaded plugins</summary>'
+      echo '<summary>Processed assets</summary>'
       echo
       echo '| Asset | Type | Status |' >>"$GITHUB_STEP_SUMMARY"
       echo '|-------|------|--------|' >>"$GITHUB_STEP_SUMMARY"
 
       printf '%s\n' "$CMD_OUTPUT" | awk '
-        BEGIN {
-          in_assets = 0
-        }
+        BEGIN { in_assets = 0 }
 
-        # Turn on parsing after "Deploying project containing ..."
         /^Deploying project containing/ {
           in_assets = 1
           next
         }
 
-        # Stop once we hit "Import report(s):"
         in_assets && /^Import report\(s\):/ {
           exit
         }
 
-        # Only process bullet lines that start with "*" (ignore warnings, blanks, etc.)
         in_assets && /^[[:space:]]*\*/ {
           line = $0
 
-          # Strip leading " * Import " (with flexible whitespace)
+          # strip leading "* Import "
           sub(/^[[:space:]]*\*[[:space:]]*Import[[:space:]]+/, "", line)
-
-          # Now line looks like:
-          #   UpdFactSales (orchestration_flow) - SUCCESS
 
           asset_type = line
           status = ""
 
-          # Extract status after " - STATUS" at the end
+          # extract status: "... - STATUS"
           if (match(asset_type, /[[:space:]]-[[:space:]]([A-Z_]+)$/)) {
-            status = substr(asset_type, RSTART + 3, RLENGTH - 3)  # skip " - "
+            status = substr(asset_type, RSTART + 3, RLENGTH - 3)
             asset_type = substr(asset_type, 1, RSTART - 1)
             sub(/[[:space:]]*$/, "", asset_type)
           }
 
-          # asset_type should now look like:
-          #   UpdFactSales (orchestration_flow)
-
           asset = asset_type
           type  = ""
 
-          # Extract type from trailing "(...)" if present
-          if (match(asset_type, /[[:space:]]*\(([^()]*)\)[[:space:]]*$/)) {
+          # extract type in parentheses
+          if (match(asset_type, /\(([^()]*)\)[[:space:]]*$/)) {
             type  = substr(asset_type, RSTART + 1, RLENGTH - 2)
             asset = substr(asset_type, 1, RSTART - 1)
-            sub(/[[:space:]]*$/, "", asset)  # trim trailing spaces
+            
+            # Trim whitespace
+            sub(/[[:space:]]*$/, "", asset)
+
+            # 🔥 NEW FIX: Remove any leading "(" from type
+            sub(/^[[:space:]]*\(/, "", type)
+
+            # Trim whitespace again
+            sub(/^[[:space:]]+/, "", type)
+            sub(/[[:space:]]+$/, "", type)
           }
 
           printf("| %s | %s | %s |\n", asset, type, status)
-        }'
+        }
+      '
 
       echo
       echo '</details>'
