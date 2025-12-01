@@ -10,7 +10,7 @@
 
 set -eu
 
-# ----- 
+# -----
 # Setup
 # -----
 MCIX_BIN_DIR="/usr/share/mcix/bin"
@@ -18,6 +18,12 @@ MCIX_CMD="$MCIX_BIN_DIR/mcix"
 PATH="$PATH:$MCIX_BIN_DIR"
 
 : "${GITHUB_OUTPUT:?GITHUB_OUTPUT must be set}"
+
+# Optional but useful for debugging
+echo "GITHUB_STEP_SUMMARY=${GITHUB_STEP_SUMMARY:-<unset>}" >&2 || true
+
+# We'll store the real command status here so the trap can see it
+MCIX_STATUS=0
 
 # ------------
 # Step summary
@@ -36,18 +42,16 @@ write_step_summary() {
     cat <<EOF
 ## ${status_emoji} MCIX DataStage Import – ${status_title}
 
-| Property      | Value                          |
-|--------------|--------------------------------|
+| Property    | Value                          |
+|------------|---------------------------------|
 | **Project**  | \`${project_display}\`        |
 | **Assets**   | \`${PARAM_ASSETS:-<none>}\`   |
 | **Exit Code** | \`${rc}\`                    |
 EOF
 
-    # If we captured any output from the main command, include it as a section
     if [ -n "${CMD_OUTPUT:-}" ]; then
       printf '\n### MettleCI Command Output\n\n'
 
-      # ---- Code block (excluding plugin list) ----
       echo '```text'
       printf '%s\n' "$CMD_OUTPUT" | awk '
         /^Loaded plugins:/ { in_plugins = 1; next }
@@ -57,7 +61,6 @@ EOF
       echo '```'
       echo
 
-      # ---- Collapsible section with plugin table ----
       echo '<details>'
       echo '<summary>Loaded plugins</summary>'
       echo
@@ -68,17 +71,15 @@ EOF
         /^Loaded plugins:/ { in_plugins = 1; next }
         in_plugins && /^\s*\*/ {
           line = $0
-          # strip leading " * "
           sub(/^\s*\*\s*/, "", line)
 
           plugin = line
           version = ""
 
-          # If there is a (...) at the end, treat that as the version
           if (match(plugin, /\(([^()]*)\)[[:space:]]*$/)) {
             version = substr(plugin, RSTART + 1, RLENGTH - 2)
             plugin  = substr(plugin, 1, RSTART - 1)
-            sub(/[[:space:]]*$/, "", plugin)  # trim trailing spaces
+            sub(/[[:space:]]*$/, "", plugin)
           }
 
           printf("| %s | %s |\n", plugin, version)
@@ -94,23 +95,21 @@ EOF
 # ---------
 # Exit trap
 # ---------
-# Generic trap that always sets return-code and writes the step summary
 write_return_code_and_summary() {
-  rc=$?
+  # Prefer MCIX_STATUS if set; fall back to $?
+  rc=${MCIX_STATUS:-$?}
+
   echo "return-code=$rc" >>"$GITHUB_OUTPUT"
 
-  # Only write step summary if GitHub provides the file
-  [ -z "${GITHUB_STEP_SUMMARY:-}" ] && exit "$rc"
+  [ -z "${GITHUB_STEP_SUMMARY:-}" ] && return
 
   write_step_summary "$rc"
-  exit "$rc"
 }
 trap write_return_code_and_summary EXIT
 
 # ------------------------
 # Build command to execute
 # ------------------------
-# Start argv
 set -- "$MCIX_CMD" system version
 
 # -------
@@ -121,10 +120,11 @@ echo "Executing: $*"
 # Run the command, capture its output and status, but don't let `set -e` kill us.
 set +e
 CMD_OUTPUT="$("$@" 2>&1)"
-status=$?
+MCIX_STATUS=$?
 set -e
 
 # Echo original command output into the job logs
 printf '%s\n' "$CMD_OUTPUT"
 
-exit "$status"
+# Let the trap handle outputs & summary using MCIX_STATUS
+exit "$MCIX_STATUS"
