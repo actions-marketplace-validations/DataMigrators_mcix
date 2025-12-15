@@ -1,7 +1,6 @@
-# action.yml
 name: 'MCIX asset-analysis test action'
 author: 'Data Migrators Pty Ltd'
-description: 'Runs mcix system version'
+description: 'Runs mcix asset-analysis test'
 
 inputs:
 
@@ -13,7 +12,7 @@ inputs:
     description: 'URL of the DataStage server'
     required: true
 
-  user:
+  username:
     description: 'Username for authentication'
     required: true
 
@@ -62,19 +61,19 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'Dockerfile' # Refers to the Dockerfile in the current directory
-  args:
-    - ${{ inputs.api-key }}
-    - ${{ inputs.url }}" 
-    - ${{ inputs.user }}
-    - ${{ inputs.report }}
-    - ${{ inputs.project }}
-    - ${{ inputs.project-id }}
-    - ${{ inputs.rules }}
-    - ${{ inputs.included-tags }}
-    - ${{ inputs.excluded-tags }}
-    - ${{ inputs.test-suite }}"
-    - ${{ inputs.ignore-test-failures }}
+  image: 'Dockerfile'
+  env:
+    PARAM_API_KEY: ${{ inputs.api-key }}
+    PARAM_URL: ${{ inputs.url }}
+    PARAM_USERNAME: ${{ inputs.username }}
+    PARAM_REPORT: ${{ inputs.report }}
+    PARAM_PROJECT: ${{ inputs.project }}
+    PARAM_PROJECT_ID: ${{ inputs.project-id }}
+    PARAM_RULES: ${{ inputs.rules }}
+    PARAM_INCLUDED_TAGS: ${{ inputs.included-tags }}
+    PARAM_EXCLUDED_TAGS: ${{ inputs.excluded-tags }}
+    PARAM_TEST_SUITE: ${{ inputs.test-suite }}
+    PARAM_IGNORE_TEST_FAILURES: ${{ inputs.ignore-test-failures }}
 
 branding:
   icon: 'search'

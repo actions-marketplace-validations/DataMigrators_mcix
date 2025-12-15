@@ -2,13 +2,13 @@
 name: 'MCIX system version action'
 author: 'Data Migrators Pty Ltd'
 description: 'Runs mcix system version'
+branding:
+  icon: 'info'
+  color: 'blue'
+
 outputs:
   return-code:
     description: 'The return code of the command'
 runs:
   using: 'docker'
   image: 'Dockerfile' # Refers to the Dockerfile in the current directory
-
-branding:
-  icon: 'info'
-  color: 'blue'

@@ -2,6 +2,10 @@
 name: 'MCIX datastage compile action'
 author: 'Data Migrators Pty Ltd'
 description: 'Runs mcix datastage compile'
+branding:
+  icon: 'zap'
+  color: 'blue'
+
 inputs:
 
   api-key:
@@ -51,7 +55,3 @@ runs:
     PARAM_PROJECT: ${{ inputs.project }}
     PARAM_PROJECT_ID: ${{ inputs.project-id }}
     PARAM_INCLUDE_ASSET_IN_TEST_NAME: ${{ inputs.include-asset-in-test-name }}
-
-branding:
-  icon: 'zap'
-  color: 'blue'

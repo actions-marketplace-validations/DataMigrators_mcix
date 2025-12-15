@@ -1,47 +1,43 @@
-# mcix datastage import GitHub action
+# MCIX DataStage Import GitHub Action
 
-This action invokes the [mcix datastage import](https://nextgen.mettleci.io/mettleci-cli/datastage-namespace/#import) command.
+Import DataStage NextGen assets into a target project using MCIX.
 
-## Inputs
+> Namespace: `datastage`  
+> Action: `import`  
+> Usage: `DataMigrators/mcix/datastage/import@v1`
 
-* api-key (Required)
+... where `v1` is the version of the action you wish to use.
 
-CP4D/CP4DaaS API key
+## 🚀 Usage
 
-* *url (Required)
-
-Base url of CP4D/CP4DaaS
-
-* user (Required)
-
-CP4D/CP4DaaS username
-
-* assets (Required)
-
-Path to DataStage export zip file or directory
-
-* project (Required when -project-id not specified)
-
-Name of target project
-
-* project-id (Required when -project not specified)
-
-Id of target project
-
-## Outputs
-
-## `output`
-
-The console output of the mcix asset-analysis test command.
-
-## Example usage
-
-```
-- name: mcix asset-analysis test action
-  uses: actions/mcix-asset-analysis-test
+```yaml
+- uses: DataMigrators/mcix/datastage/import@v1
   with:
-    rules: '/app/rules'
-    path: '/app/datastage'
-    report: '/app/asset_analysis_report.xml'
-    test-suite: 'mcix tests'
+    api-key: ${{ secrets.MCIX_API_KEY }}
+    url: https://your-mcix-server/api
+    user: dm-automation
+    assets: ./datastage/assets/MyFlow.json
+    project: GitHub_CP4D_DevOps
 ```
+
+## 🔧 Inputs
+
+| Name         | Required | Description |
+|--------------|----------|-------------|
+| api-key      | Yes      | MCIX API key |
+| url          | Yes      | MCIX server URL |
+| user         | Yes      | Logical MCIX user |
+| assets       | Yes      | Asset file(s) to import |
+| project      | Conditional | Project name |
+| project-id   | Conditional | Project ID |
+
+## 📤 Outputs
+
+| Name | Description |
+|------|-------------|
+| return-code | Exit code |
+
+## 📚 More information
+
+See https://nextgen.mettleci.io/mettleci-cli/datastage-namespace/#datastage-import
+

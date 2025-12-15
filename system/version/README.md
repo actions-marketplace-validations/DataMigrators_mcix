@@ -1,47 +1,27 @@
-# MCIX asset-analysis test docker action
+# MCIX System Version GitHub Action
 
-This action invokes the [mcix asset-analysis test](https://nextgen.mettleci.io/mettleci-cli/asset-analysis-namespace/#asset-analysis-test) command.
+Reports the MCIX toolset version available in the container.
 
-## Inputs
+> Namespace: `system`  
+> Action: `version`  
+> Usage: `DataMigrators/mcix/system/version@v1`
 
-## Rules
+## 🚀 Usage
 
-**Required** Path to the compliance rules. Default `/app/rules`.
-
-## Path
-        description: 'Path to the DataStage assets to analyze'
-        required: false
-        default: /app/datastage
-## Report
-        description: 'JUnit report file path'
-        required: false
-        default: /app/asset_analysis_report.xml
-## Test-suite
-        description: 'Test suite name'
-        required: false
-        default: 'mcix tests'
-
-## Ignore-test-failures
-
-Ignore test failures (always return 0)
-
-## Include-job-in-test-name
-Include job name in test name
-
-## Outputs
-
-## `output`
-
-The console output of the mcix asset-analysis test command.
-
-## Example usage
-
+```yaml
+- uses: DataMigrators/mcix/system/version@v1
 ```
-- name: mcix asset-analysis test action
-  uses: actions/mcix-asset-analysis-test
-  with:
-    rules: '/app/rules'
-    path: '/app/datastage'
-    report: '/app/asset_analysis_report.xml'
-    test-suite: 'mcix tests'
-```
+
+## 🔧 Inputs
+
+None.
+
+## 📤 Outputs
+
+| Name | Description |
+|------|-------------|
+| version | MCIX version string |
+
+## 📚 More information
+
+See https://nextgen.mettleci.io/mettleci-cli/system-namespace/#system-version

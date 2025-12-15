@@ -1,47 +1,45 @@
-# mcix unit-test execute docker action
+# MCIX DataStage Unit Test Execute GitHub Action
 
-This action invokes the [mcix unit-test execute](https://nextgen.mettleci.io/mettleci-cli/unit-test-namespace/#execute) command.
+Run DataStage unit tests managed by MCIX as part of CI/CD.
 
-## Inputs
+> Namespace: `unit-test`  
+> Action: `execute`  
+> Usage: `DataMigrators/mcix/unit-test/execute@v1`
 
-## Rules
+## 🚀 Usage
 
-**Required** Path to the compliance rules. Default `/app/rules`.
-
-## Path
-        description: 'Path to the DataStage assets to analyze'
-        required: false
-        default: /app/datastage
-## Report
-        description: 'JUnit report file path'
-        required: false
-        default: /app/asset_analysis_report.xml
-## Test-suite
-        description: 'Test suite name'
-        required: false
-        default: 'mcix tests'
-
-## Ignore-test-failures
-
-Ignore test failures (always return 0)
-
-## Include-job-in-test-name
-Include job name in test name
-
-## Outputs
-
-## `output`
-
-The console output of the mcix asset-analysis test command.
-
-## Example usage
-
-```
-- name: mcix asset-analysis test action
-  uses: actions/mcix-asset-analysis-test
+```yaml
+- uses: DataMigrators/mcix/unit-test/execute@v1
   with:
-    rules: '/app/rules'
-    path: '/app/datastage'
-    report: '/app/asset_analysis_report.xml'
-    test-suite: 'mcix tests'
+    api-key: ${{ secrets.MCIX_API_KEY }}
+    url: https://your-mcix-server/api
+    user: dm-automation
+    report: unit-tests
+    project: GitHub_CP4D_DevOps
 ```
+
+## 🔧 Inputs
+
+| Name                   | Required | Description |
+|------------------------|----------|-------------|
+| api-key                | Yes      | MCIX API key |
+| url                    | Yes      | MCIX URL |
+| user                   | Yes      | Logical user |
+| report                 | Yes      | Report/mode |
+| project                | Conditional | Project name |
+| project-id             | Conditional | Project ID |
+| max-concurrency        | Optional | Concurrency level |
+| included-tags          | Optional | Include tags |
+| excluded-tags          | Optional | Exclude tags |
+| test-suite             | Optional | Suite name |
+| ignore-test-failures   | Optional | Bool |
+
+## 📤 Outputs
+
+| Name | Description |
+|------|-------------|
+| return-code | Exit code |
+
+## 📚 More information
+
+See https://nextgen.mettleci.io/mettleci-cli/unit-test-namespace/#unit-test-execute

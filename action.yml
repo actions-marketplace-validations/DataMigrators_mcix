@@ -1,13 +1,13 @@
-# action.yml
 name: 'MCIX for IBM DataStage'
+author: 'Data Migrators Pty Ltd'
 description: 'Provides mcix-based operations for IBM DataStage DevOps tasks'
+branding:
+  icon: 'info'
+  color: 'blue'
+
 outputs:
   return-code:
     description: 'The return code of the command'
 runs:
   using: 'docker'
   image: 'Dockerfile' # Refers to the Dockerfile in the current directory
-
-branding:
-  icon: 'zap'
-  color: 'blue'

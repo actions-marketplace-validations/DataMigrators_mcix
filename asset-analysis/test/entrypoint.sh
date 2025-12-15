@@ -1,6 +1,9 @@
 #!/bin/sh -l
 set -eu
 
+# Failure handling utility function
+die() { echo "$*" 1>&2 ; exit 1; }
+
 MCIX_BIN_DIR="/usr/share/mcix/bin"
 MCIX_CMD="$MCIX_BIN_DIR/mcix"
 PATH="$PATH:$MCIX_BIN_DIR"
@@ -8,15 +11,13 @@ PATH="$PATH:$MCIX_BIN_DIR"
 # Validate required vars
 : "${PARAM_API_KEY:?Missing required input: api-key}"
 : "${PARAM_URL:?Missing required input: url}"
-: "${PARAM_USER:?Missing required input: user}"
+: "${PARAM_USERNAME:?Missing required input: username}"
 : "${PARAM_REPORT:?Missing required input: report}"
+: "${PARAM_RULES:?Missing required input: rules}"
 
 # Optional arguments
 PROJECT="${PARAM_PROJECT:-}"
 PROJECT_ID="${PARAM_PROJECT_ID:-}"
-
-# Failure handling utility function
-die() { echo "$*" 1>&2 ; exit 1; }
 
 # 1) Fail if BOTH project and project-id were provided
 if [ -n "$PROJECT" ] && [ -n "$PROJECT_ID" ]; then
@@ -32,8 +33,9 @@ fi
 CMD="$MCIX_CMD asset-analysis test \
  -api-key \"$PARAM_API_KEY\" \
  -url \"$PARAM_URL\" \
- -user \"$PARAM_USER\" \
- -report \"$PARAM_REPORT\""
+ -username \"$PARAM_USERNAME\" \
+ -report \"$PARAM_REPORT\" \
+ -rules \"$PARAM_RULES\""
 
 # Add optional argument flags
 #[ -n "$PARAM_INCLUDE_ASSET_IN_TEST_NAME" ] && CMD="$CMD -include-asset-in-test-name"
@@ -41,6 +43,18 @@ CMD="$MCIX_CMD asset-analysis test \
 # Add optional project/project-id
 [ -n "$PROJECT" ] && CMD="$CMD -project \"$PROJECT\""
 [ -n "$PROJECT_ID" ] && CMD="$CMD -project-id \"$PROJECT_ID\""
+
+# Echo diagnostics for included and excluded tags
+[ -n "$PARAM_INCLUDED_TAGS" ] && CMD="$CMD -include-tag $PARAM_INCLUDED_TAGS"
+if [ -n "$PARAM_EXCLUDED_TAGS" ]; then 
+  CMD="$CMD -exclude-tag example,$PARAM_EXCLUDED_TAGS"
+else
+  CMD="$CMD -exclude-tag example"
+fi
+
+[ -n "$PARAM_TEST_SUITE" ] && CMD="$CMD -test-suite \"$PARAM_TEST_SUITE\""
+
+[ -n "$PARAM_IGNORE_TEST_FAILURES" ] && CMD="$CMD -ignore-test-failures"
 
 echo "Executing: $CMD"
 

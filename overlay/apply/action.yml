@@ -1,0 +1,37 @@
+name: "MCIX DataStage Overlay Apply"
+description: "Apply overlay directories to DataStage export assets using the MCIX overlay apply command."
+author: "DataMigrators"
+branding:
+  icon: "layers"
+  color: "blue"
+
+inputs:
+  assets:
+    description: "Path to DataStage export zip file or directory."
+    required: true
+  output:
+    description: "Zip file or directory to write updated assets."
+    required: true
+  overlay:
+    description: >-
+      Directory containing asset overlays. Each overlay will be applied in
+      specified order when providing multiple
+      (e.g., -overlay dir1 -overlay dir2)
+    required: true
+  properties:
+    description: "Optional properties file with replacement values."
+    required: false
+    default: ""
+
+outputs:
+  return-code:
+    description: "Exit code returned by the mcix overlay apply command."
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    PARAM_ASSETS: ${{ inputs.assets }}
+    PARAM_OUTPUT: ${{ inputs.output }}
+    PARAM_OVERLAY: ${{ inputs.overlay }}
+    PARAM_PROPERTIES: ${{ inputs.properties }}

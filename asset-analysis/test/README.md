@@ -1,47 +1,44 @@
-# MCIX asset-analysis test docker action
+# MCIX Asset Analysis Test GitHub Action
 
-This action invokes the [mcix asset-analysis test](https://nextgen.mettleci.io/mettleci-cli/asset-analysis-namespace/#asset-analysis-test) command.
+Run **MCIX asset-level static analysis** for IBM DataStage NextGen inside your GitHub workflows.
 
-## Inputs
+This action wraps the `mcix asset-analysis test` command, letting you run MCIX compliance checks against one or more DataStage assets as part of CI/CD.
 
-## Rules
+> Namespace: `asset-analysis`  
+> Action: `test`  
+> Usage: `DataMigrators/mcix/asset-analysis/test@v1`
 
-**Required** Path to the compliance rules. Default `/app/rules`.
+## 🚀 Usage
 
-## Path
-        description: 'Path to the DataStage assets to analyze'
-        required: false
-        default: /app/datastage
-## Report
-        description: 'JUnit report file path'
-        required: false
-        default: /app/asset_analysis_report.xml
-## Test-suite
-        description: 'Test suite name'
-        required: false
-        default: 'mcix tests'
-
-## Ignore-test-failures
-
-Ignore test failures (always return 0)
-
-## Include-job-in-test-name
-Include job name in test name
-
-## Outputs
-
-## `output`
-
-The console output of the mcix asset-analysis test command.
-
-## Example usage
-
-```
-- name: mcix asset-analysis test action
-  uses: actions/mcix-asset-analysis-test
+```yaml
+- uses: DataMigrators/mcix/asset-analysis/test@v1
   with:
-    rules: '/app/rules'
-    path: '/app/datastage'
-    report: '/app/asset_analysis_report.xml'
-    test-suite: 'mcix tests'
+    api-key: ${{ secrets.MCIX_API_KEY }}
+    url: https://your-mcix-server/api
+    user: datastage.dev
+    project: MyDataStageProject
+    assets: ./datastage/assets
+    report: asset-analysis
 ```
+
+## 🔧 Inputs
+
+| Name         | Required | Description |
+|--------------|----------|-------------|
+| api-key      | Yes      | API key for MCIX |
+| url          | Yes      | MCIX base URL |
+| user         | Yes      | Logical MCIX user |
+| assets       | Optional | Paths to assets |
+| project      | Conditional | Project name |
+| project-id   | Conditional | Project ID |
+| report       | Optional | Ruleset/report name |
+
+## 📤 Outputs
+
+| Name | Description |
+|------|-------------|
+| return-code | Exit code from MCIX |
+
+## 📚 More information
+
+See https://docs.mettleci.io
