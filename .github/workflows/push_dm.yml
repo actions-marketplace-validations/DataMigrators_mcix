@@ -1,7 +1,11 @@
 name: Copy mcix image to mettleci
 
+name: Retag 'latest' on version release
 
 on:
+  push:
+    tags:
+      - 'v*.*.*'   # triggers on vX.Y.Z (e.g. v1.2.3)
 #  workflow_dispatch:
 #  schedule:
 #    - cron: "0 2 * * *"   # optional: nightly sync
