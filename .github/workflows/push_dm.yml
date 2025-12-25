@@ -1,0 +1,28 @@
+name: Copy mcix image to mettleci
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  copy-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull source
+        run: docker pull ghcr.io/datamigrators/mcix:latest
+
+      - name: Retag target
+        run: docker tag ghcr.io/datamigrators/mcix:latest ghcr.io/mettleci/mcix:latest
+
+      - name: Push target
+        run: docker push ghcr.io/mettleci/mcix:latest
