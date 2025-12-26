@@ -64,4 +64,5 @@ sh -c "$CMD"
 status=$?
 
 echo "return-code=$status" >> "$GITHUB_OUTPUT"
+echo "report=$PARAM_REPORT" >> "$GITHUB_OUTPUT"
 exit "$status"
