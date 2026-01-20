@@ -11,9 +11,17 @@ PATH="$PATH:$MCIX_BIN_DIR"
 # Validate required vars
 : "${PARAM_API_KEY:?Missing required input: api-key}"
 : "${PARAM_URL:?Missing required input: url}"
-: "${PARAM_USERNAME:?Missing required input: username}"
+: "${PARAM_USER:?Missing required input: user}"
 : "${PARAM_REPORT:?Missing required input: report}"
 : "${PARAM_RULES:?Missing required input: rules}"
+
+normalise_bool() {
+  case "$1" in
+    1|true|TRUE|yes|YES|on|ON) echo 1 ;;
+    0|false|FALSE|no|NO|off|OFF|"") echo 0 ;;
+    *) die "Invalid boolean: $1" ;;
+  esac
+}
 
 # Optional arguments
 PROJECT="${PARAM_PROJECT:-}"
@@ -33,12 +41,9 @@ fi
 CMD="$MCIX_CMD asset-analysis test \
  -api-key \"$PARAM_API_KEY\" \
  -url \"$PARAM_URL\" \
- -username \"$PARAM_USERNAME\" \
+ -user \"$PARAM_USER\" \
  -report \"$PARAM_REPORT\" \
  -rules \"$PARAM_RULES\""
-
-# Add optional argument flags
-#[ -n "$PARAM_INCLUDE_ASSET_IN_TEST_NAME" ] && CMD="$CMD -include-asset-in-test-name"
 
 # Add optional project/project-id
 [ -n "$PROJECT" ] && CMD="$CMD -project \"$PROJECT\""
@@ -47,14 +52,16 @@ CMD="$MCIX_CMD asset-analysis test \
 # Echo diagnostics for included and excluded tags
 [ -n "$PARAM_INCLUDED_TAGS" ] && CMD="$CMD -include-tag $PARAM_INCLUDED_TAGS"
 if [ -n "$PARAM_EXCLUDED_TAGS" ]; then 
-  CMD="$CMD -exclude-tag example,$PARAM_EXCLUDED_TAGS"
+  CMD="$CMD -exclude-tags example,$PARAM_EXCLUDED_TAGS"
 else
-  CMD="$CMD -exclude-tag example"
+  CMD="$CMD -exclude-tags example"
 fi
 
 [ -n "$PARAM_TEST_SUITE" ] && CMD="$CMD -test-suite \"$PARAM_TEST_SUITE\""
 
-[ -n "$PARAM_IGNORE_TEST_FAILURES" ] && CMD="$CMD -ignore-test-failures"
+[[ -n "$PARAM_IGNORE_TEST_FAILURES" ]] && [[ "$(normalise_bool "${PARAM_IGNORE_TEST_FAILURES:-0}")" == "1" ]] && CMD="$CMD -ignore-test-failures"
+
+[[ -n "$PARAM_INCLUDE_ASSET_IN_TEST_NAME" ]] && [[ "$(normalise_bool "${PARAM_INCLUDE_ASSET_IN_TEST_NAME:-0}")" == "1" ]] && CMD="$CMD -include-asset-in-test-name"
 
 echo "Executing: $CMD"
 
