@@ -12,7 +12,7 @@ inputs:
     description: 'URL of the DataStage server'
     required: true
 
-  username:
+  user:
     description: 'Username for authentication'
     required: true
 
@@ -51,6 +51,11 @@ inputs:
     required: false
     default: 'mcix tests'
 
+  include-asset-in-test-name:
+    description: 'Whether to include asset names in test names in the report'
+    required: false
+    default: "false"
+
   ignore-test-failures:
     description: 'Ignore test failures (always return 0)'
     required: false
@@ -67,7 +72,7 @@ runs:
   env:
     PARAM_API_KEY: ${{ inputs.api-key }}
     PARAM_URL: ${{ inputs.url }}
-    PARAM_USERNAME: ${{ inputs.username }}
+    PARAM_USER: ${{ inputs.user }}
     PARAM_REPORT: ${{ inputs.report }}
     PARAM_PROJECT: ${{ inputs.project }}
     PARAM_PROJECT_ID: ${{ inputs.project-id }}
@@ -75,8 +80,8 @@ runs:
     PARAM_INCLUDED_TAGS: ${{ inputs.included-tags }}
     PARAM_EXCLUDED_TAGS: ${{ inputs.excluded-tags }}
     PARAM_TEST_SUITE: ${{ inputs.test-suite }}
+    PARAM_INCLUDE_ASSET_IN_TEST_NAME: ${{ inputs.include-asset-in-test-name }}
     PARAM_IGNORE_TEST_FAILURES: ${{ inputs.ignore-test-failures }}
-
 branding:
   icon: 'search'
   color: 'blue'
