@@ -50,7 +50,7 @@ CMD="$MCIX_CMD asset-analysis test \
 [ -n "$PROJECT_ID" ] && CMD="$CMD -project-id \"$PROJECT_ID\""
 
 # Echo diagnostics for included and excluded tags
-[ -n "$PARAM_INCLUDED_TAGS" ] && CMD="$CMD -include-tag $PARAM_INCLUDED_TAGS"
+[ -n "$PARAM_INCLUDED_TAGS" ] && CMD="$CMD -include-tags $PARAM_INCLUDED_TAGS"
 if [ -n "$PARAM_EXCLUDED_TAGS" ]; then 
   CMD="$CMD -exclude-tags example,$PARAM_EXCLUDED_TAGS"
 else
