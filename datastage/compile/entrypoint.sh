@@ -125,92 +125,9 @@ fi
 write_step_summary() {
   rc=$1
 
-  status_emoji="✅"
-  status_title="Success"
-  [ "$rc" -ne 0 ] && status_emoji="❌" && status_title="Failure"
-
-  project_display="${PROJECT:-<none>}"
-  [ -n "${PROJECT_ID:-}" ] && project_display="${project_display} (ID: ${PROJECT_ID})"
-
-  {
-    cat <<EOF
-### ${status_emoji} MCIX DataStage Compile – ${status_title}
-
-| Property                    | Value                          |
-|----------------------------|---------------------------------|
-| **Project**                | \`${project_display}\`          |
-| **Report**                 | \`${PARAM_REPORT}\`             |
-| **Include Asset In Test Name** | \`${include_label}\`        |
-EOF
-
-    if [ -n "${CMD_OUTPUT:-}" ]; then
-      #printf '\n### MettleCI Command Output\n\n'
-      #echo '```text'
-      #printf '%s\n' "$CMD_OUTPUT" 
-      #echo '```'
-      #echo
-
-      echo '<details>'
-      echo '<summary>Compiled assets</summary>'
-      echo
-      echo '| Asset | Type | Status |' >>"$GITHUB_STEP_SUMMARY"
-      echo '|-------|------|--------|' >>"$GITHUB_STEP_SUMMARY"
-
-      printf '%s\n' "$CMD_OUTPUT" | awk '
-        BEGIN { in_assets = 0 }
-
-        /^Compiling/ {
-          in_assets = 1
-          next
-        }
-
-        in_assets && /^Import report\(s\):/ {
-          exit
-        }
-
-        in_assets && /^[[:space:]]*\*/ {
-          line = $0
-
-          # strip leading "* Import "
-          sub(/^[[:space:]]*\*[[:space:]]*Import[[:space:]]+/, "", line)
-
-          asset_type = line
-          status = ""
-
-          # extract status: "... - STATUS"
-          if (match(asset_type, /[[:space:]]-[[:space:]]([A-Z_]+)$/)) {
-            status = substr(asset_type, RSTART + 3, RLENGTH - 3)
-            asset_type = substr(asset_type, 1, RSTART - 1)
-            sub(/[[:space:]]*$/, "", asset_type)
-          }
-
-          asset = asset_type
-          type  = ""
-
-          # extract type in parentheses
-          if (match(asset_type, /\(([^()]*)\)[[:space:]]*$/)) {
-            type  = substr(asset_type, RSTART + 1, RLENGTH - 2)
-            asset = substr(asset_type, 1, RSTART - 1)
-            
-            # Trim whitespace
-            sub(/[[:space:]]*$/, "", asset)
-
-            # Remove any leading "(" from type
-            sub(/^[[:space:]]*\(/, "", type)
-
-            # Trim whitespace again
-            sub(/^[[:space:]]+/, "", type)
-            sub(/[[:space:]]+$/, "", type)
-          }
-
-          printf("| %s | %s | %s |\n", asset, type, status)
-        }
-      '
-
-      echo
-      echo '</details>'
-    fi
-  } >>"$GITHUB_STEP_SUMMARY"
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    mcix-junit-to-summary "$PARAM_REPORT" "MCIX DataStage Compile"
+  fi
 }
 
 # ---------
@@ -225,11 +142,7 @@ write_return_code_and_summary() {
 
   [ -z "${GITHUB_STEP_SUMMARY:-}" ] && return
 
-  # write_step_summary "$rc"
-
-  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-    mcix-junit-to-summary "$PARAM_REPORT" "MCIX DataStage Compile"
-  fi
+  write_step_summary "$rc"
 }
 trap write_return_code_and_summary EXIT
 
