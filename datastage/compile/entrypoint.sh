@@ -83,7 +83,7 @@ require PARAM_USER "user"
 require PARAM_REPORT "report"
 
 # Ensure PARAM_REPORT will always be /github/workspace/...
-# so it survives container exit and is publishable as an artifact.
+# so it survives container exit and is accessible as an artifact.
 PARAM_REPORT="$(resolve_report_path "$PARAM_REPORT")"
 mkdir -p "$(dirname "$PARAM_REPORT")"
 report_display="${PARAM_REPORT#${GITHUB_WORKSPACE:-/github/workspace}/}"
@@ -225,7 +225,11 @@ write_return_code_and_summary() {
 
   [ -z "${GITHUB_STEP_SUMMARY:-}" ] && return
 
-  write_step_summary "$rc"
+  # write_step_summary "$rc"
+
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    mcix-junit-to-summary "$PARAM_REPORT" "MCIX DataStage Compile"
+  fi
 }
 trap write_return_code_and_summary EXIT
 
