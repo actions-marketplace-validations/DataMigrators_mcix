@@ -126,9 +126,10 @@ fi
 write_step_summary() {
   rc=$1
 
-  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+  # Only attempt a summary if GitHub provided a writable summary file
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -w "$GITHUB_STEP_SUMMARY" ]; then
     ls -l "$MCIX_BIN_DIR"
-    "$MCIX_JUNIT_CMD" "$PARAM_REPORT" "MCIX DataStage Compile"
+    python3 "$MCIX_JUNIT_CMD" "$PARAM_REPORT" "MCIX DataStage Compile" >>"$GITHUB_STEP_SUMMARY" || true
   fi
 }
 
