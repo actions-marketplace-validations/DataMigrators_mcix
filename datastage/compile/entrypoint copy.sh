@@ -1,6 +1,4 @@
-#!/bin/sh
-# Don't use -l here; we want to preserve the PATH and other env vars 
-# as set in the base image, and not have it overridden by a login shell
+#!/bin/sh -l
 
 # ███╗   ███╗███████╗████████╗████████╗██╗     ███████╗ ██████╗██╗
 # ████╗ ████║██╔════╝╚══██╔══╝╚══██╔══╝██║     ██╔════╝██╔════╝██║
@@ -15,11 +13,9 @@ set -eu
 # -----
 # Setup
 # -----
-export MCIX_BIN_DIR="/usr/share/mcix/bin"
-export MCIX_CMD="mcix" 
-export MCIX_JUNIT_CMD="/usr/share//mcix/mcix-junit-to-summary"
-# Make us immune to runner differences or potential base-image changes
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$MCIX_BIN_DIR"
+MCIX_BIN_DIR="/usr/share/mcix/bin"
+MCIX_CMD="$MCIX_BIN_DIR/mcix"
+PATH="$PATH:$MCIX_BIN_DIR"
 
 : "${GITHUB_OUTPUT:?GITHUB_OUTPUT must be set}"
 
@@ -129,12 +125,92 @@ fi
 write_step_summary() {
   rc=$1
 
-  # Only attempt a summary if GitHub provided a writable summary file
-  if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -w "$GITHUB_STEP_SUMMARY" ]; then
-    "$MCIX_JUNIT_CMD" "$PARAM_REPORT" "MCIX DataStage Compile" >>"$GITHUB_STEP_SUMMARY" || true
-  else
-    echo "GitHub didn't provide a writable summary file; skipping junit summary generation" >>"$GITHUB_STEP_SUMMARY"
-  fi
+  status_emoji="✅"
+  status_title="Success"
+  [ "$rc" -ne 0 ] && status_emoji="❌" && status_title="Failure"
+
+  project_display="${PROJECT:-<none>}"
+  [ -n "${PROJECT_ID:-}" ] && project_display="${project_display} (ID: ${PROJECT_ID})"
+
+  {
+    cat <<EOF
+### ${status_emoji} MCIX DataStage Compile – ${status_title}
+
+| Property                    | Value                          |
+|----------------------------|---------------------------------|
+| **Project**                | \`${project_display}\`          |
+| **Report**                 | \`${PARAM_REPORT}\`             |
+| **Include Asset In Test Name** | \`${include_label}\`        |
+EOF
+
+    if [ -n "${CMD_OUTPUT:-}" ]; then
+      #printf '\n### MettleCI Command Output\n\n'
+      #echo '```text'
+      #printf '%s\n' "$CMD_OUTPUT" 
+      #echo '```'
+      #echo
+
+      echo '<details>'
+      echo '<summary>Compiled assets</summary>'
+      echo
+      echo '| Asset | Type | Status |' >>"$GITHUB_STEP_SUMMARY"
+      echo '|-------|------|--------|' >>"$GITHUB_STEP_SUMMARY"
+
+      printf '%s\n' "$CMD_OUTPUT" | awk '
+        BEGIN { in_assets = 0 }
+
+        /^Compiling/ {
+          in_assets = 1
+          next
+        }
+
+        in_assets && /^Import report\(s\):/ {
+          exit
+        }
+
+        in_assets && /^[[:space:]]*\*/ {
+          line = $0
+
+          # strip leading "* Import "
+          sub(/^[[:space:]]*\*[[:space:]]*Import[[:space:]]+/, "", line)
+
+          asset_type = line
+          status = ""
+
+          # extract status: "... - STATUS"
+          if (match(asset_type, /[[:space:]]-[[:space:]]([A-Z_]+)$/)) {
+            status = substr(asset_type, RSTART + 3, RLENGTH - 3)
+            asset_type = substr(asset_type, 1, RSTART - 1)
+            sub(/[[:space:]]*$/, "", asset_type)
+          }
+
+          asset = asset_type
+          type  = ""
+
+          # extract type in parentheses
+          if (match(asset_type, /\(([^()]*)\)[[:space:]]*$/)) {
+            type  = substr(asset_type, RSTART + 1, RLENGTH - 2)
+            asset = substr(asset_type, 1, RSTART - 1)
+            
+            # Trim whitespace
+            sub(/[[:space:]]*$/, "", asset)
+
+            # Remove any leading "(" from type
+            sub(/^[[:space:]]*\(/, "", type)
+
+            # Trim whitespace again
+            sub(/^[[:space:]]+/, "", type)
+            sub(/[[:space:]]+$/, "", type)
+          }
+
+          printf("| %s | %s | %s |\n", asset, type, status)
+        }
+      '
+
+      echo
+      echo '</details>'
+    fi
+  } >>"$GITHUB_STEP_SUMMARY"
 }
 
 # ---------
@@ -149,7 +225,11 @@ write_return_code_and_summary() {
 
   [ -z "${GITHUB_STEP_SUMMARY:-}" ] && return
 
-  write_step_summary "$rc"
+  # write_step_summary "$rc"
+
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    mcix-junit-to-summary "$PARAM_REPORT" "MCIX DataStage Compile"
+  fi
 }
 trap write_return_code_and_summary EXIT
 
@@ -157,11 +237,6 @@ trap write_return_code_and_summary EXIT
 # Execute
 # -------
 echo "Executing: $*"
-
-# Check the repository has been checked out
-if [ ! -e "/github/workspace/.git" ] && [ ! -e "/github/workspace/$PARAM_ASSETS" ]; then
-  die "Repo contents not found in /github/workspace. Did you forget to run actions/checkout@v4 before this action?"
-fi
 
 # Run the command, capture its output and status, but don't let `set -e` kill us.
 set +e

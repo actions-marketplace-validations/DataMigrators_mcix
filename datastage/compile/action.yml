@@ -22,8 +22,8 @@ inputs:
 
   report:
     description: 'Path to output the compile report'
-    required: true
-    default: "./compile-report.xml"
+    required: false
+    default: "compile-report.xml"
 
   project:
     description: 'DataStage project name'

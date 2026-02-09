@@ -1,0 +1,34 @@
+# This is a temporary solution to help accelerate development by 
+# automatically creating a release for every commit. This allows 
+# us to easily test the release process and ensure that the 
+# generated artifacts are correct. We can remove this workflow 
+# once we are confident that the release process is working correctly.
+
+name: Auto Release (Every Commit)
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: commit-${{ github.sha }}
+          name: Commit ${{ github.sha }}
+          body: |
+            Automated release for commit:
+            ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
