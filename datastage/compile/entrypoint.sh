@@ -129,14 +129,11 @@ fi
 write_step_summary() {
   rc=$1
 
-  # Only call the summary script if Python is available
-  if python3 >/dev/null 2>&1; then
-    # Only attempt a summary if GitHub provided a writable summary file
-    if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -w "$GITHUB_STEP_SUMMARY" ]; then
-      "$MCIX_JUNIT_CMD" "$PARAM_REPORT" "MCIX DataStage Compile" >>"$GITHUB_STEP_SUMMARY" || true
-    fi
+  # Only attempt a summary if GitHub provided a writable summary file
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -w "$GITHUB_STEP_SUMMARY" ]; then
+    "$MCIX_JUNIT_CMD" "$PARAM_REPORT" "MCIX DataStage Compile" >>"$GITHUB_STEP_SUMMARY" || true
   else
-    echo "python3 not available; skipping junit summary" >>"$GITHUB_STEP_SUMMARY"
+    echo "GitHub didn't provide a writable summary file; skipping junit summary generation" >>"$GITHUB_STEP_SUMMARY"
   fi
 }
 
